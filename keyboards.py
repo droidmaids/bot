@@ -15,5 +15,5 @@ def films_keyboard_markup(films: list):
             callback_data=callback_data.pack()
         )
     
-    builder.adjust(3, repeat=True)
+    builder.adjust(2, repeat=True)
     return builder.as_markup()
