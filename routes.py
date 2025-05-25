@@ -1,10 +1,12 @@
 from aiogram import Router
 from aiogram.types import Message, CallbackQuery, URLInputFile, ReplyKeyboardRemove
+from aiogram.fsm.context import FSMContext
 
-from commands import FILM_COMMAND
+from commands import FILM_COMMAND, ADD_FILM_COMMAND
 import data
 from keyboards import films_keyboard_markup, FilmCallback
 from models import FilmModel
+from forms import FilmForm
 
 films_router = Router()
 
@@ -20,7 +22,7 @@ async def get_films(message: Message):
 
 @films_router.callback_query(FilmCallback.filter())
 async def get_film(callback: CallbackQuery, callback_data: FilmCallback):
-    film_data = data.get_films(callback_data.id)
+    film_data = data.get_films(film_id=callback_data.id)
     film = FilmModel(**film_data)
     text = f"""
     Фільм: {film.name}
@@ -35,4 +37,64 @@ async def get_film(callback: CallbackQuery, callback_data: FilmCallback):
                 url=film.poster,
                 filename=film.name
             )
+    )
+
+
+
+@films_router.message(ADD_FILM_COMMAND)
+async def add_film(message: Message, state: FSMContext):
+    await state.set_state(FilmForm.name)
+    await message.answer(
+        text="Введіть назву фільму",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+
+@films_router.message(FilmForm.name)
+async def get_film_name(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    await state.set_state(FilmForm.description)
+    await message.answer(
+        text="Введіть опис для фільму.",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+
+@films_router.message(FilmForm.description)
+async def get_film_description(message: Message, state: FSMContext):
+    await state.update_data(description=message.text)
+    await state.set_state(FilmForm.rating)
+    await message.answer(
+        text="Введіть рейтинг фільму від 0 до 18.",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+
+@films_router.message(FilmForm.rating)
+async def get_film_rating(message: Message, state: FSMContext):
+    await state.update_data(rating=message.text)
+    await state.set_state(FilmForm.genre)
+    await message.answer(
+        text="Введіть жанр фільму.",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+
+@films_router.message(FilmForm.genre)
+async def get_film_genre(message: Message, state: FSMContext):
+    await state.update_data(actors=message.text)
+    await state.set_state(FilmForm.actors)
+    await message.answer(
+        text="Введіть акторів фільму через кому та пробіл ', '",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+
+@films_router.message(FilmForm.actors)
+async def get_film_actors(message: Message, state: FSMContext):
+    await state.update_data(actors=message.text)
+    await state.set_state(FilmForm.poster)
+    await message.answer(
+        text="Вставте покликання на постер фільму.",
+        reply_markup=ReplyKeyboardRemove()
     )
