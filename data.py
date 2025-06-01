@@ -17,3 +17,10 @@ def add_film(film_data: Dict, file_path: str = "films.json") -> None:
 
     with open(file_path, "w", encoding="utf-8") as file:
         json.dump(films, file, ensure_ascii=False, indent=2)
+
+def delete_file(film_id: int, file_path: str = "films.json") -> None:
+    films = get_films()
+    films.pop(film_id)
+
+    with open(file_path, "w", encoding="utf-8") as file:
+        json.dump(films, file, ensure_ascii=False, indent=2)

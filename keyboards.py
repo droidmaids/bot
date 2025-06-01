@@ -17,3 +17,12 @@ def films_keyboard_markup(films: list):
     
     builder.adjust(2, repeat=True)
     return builder.as_markup()
+
+def del_film_keyboard(film_id: int ):
+    builder = InlineKeyboardBuilder()
+    builder.button(
+        text="Видалити фільм",
+        callback_data=f"del_film_{film_id}"
+    )
+    
+    return builder.as_markup()
