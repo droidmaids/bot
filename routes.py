@@ -83,7 +83,7 @@ async def get_film_rating(message: Message, state: FSMContext):
 
 @films_router.message(FilmForm.genre)
 async def get_film_genre(message: Message, state: FSMContext):
-    await state.update_data(actors=message.text)
+    await state.update_data(genre=message.text)
     await state.set_state(FilmForm.actors)
     await message.answer(
         text="Введіть акторів фільму через кому та пробіл ', '",
@@ -93,7 +93,7 @@ async def get_film_genre(message: Message, state: FSMContext):
 
 @films_router.message(FilmForm.actors)
 async def get_film_actors(message: Message, state: FSMContext):
-    await state.update_data(actors=message.text)
+    await state.update_data(actors=message.text.split(", "))
     await state.set_state(FilmForm.poster)
     await message.answer(
         text="Вставте покликання на постер фільму.",
